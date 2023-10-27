@@ -21,17 +21,23 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.techullurgy.composeuisapplication.R
 
 private val grayColor = Color(0xff8a95b3)
 
@@ -47,7 +53,9 @@ fun ChatDetailsScreen() {
         DateText()
         Spacer(modifier = Modifier.height(8.dp))
         MessagesSection(
-            modifier = Modifier.padding(horizontal = 8.dp),
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .weight(1f),
             messageDetails = listOf(
                 MessageDetail(
                     ownerType = OwnerType.Me,
@@ -81,6 +89,9 @@ fun ChatDetailsScreen() {
                 )
             )
         )
+        BottomBar(
+            modifier = Modifier.padding(8.dp)
+        )
     }
 }
 
@@ -89,7 +100,7 @@ private fun MessagesSection(
     messageDetails: List<MessageDetail>,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.Bottom) {
         for(i in messageDetails.indices) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -167,7 +178,7 @@ private fun OtherMessage(
 ) {
     Row(modifier = modifier) {
         if(canShowProfilePicture) {
-            ProfilePicture(isOnline = true)
+            ProfilePicture(isOnline = true, color = Color.Magenta)
         } else {
             Spacer(modifier = Modifier.width(50.dp))
         }
@@ -221,9 +232,9 @@ private fun TopBar() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            ProfilePicture(isOnline = true)
+            ProfilePicture(isOnline = true, color = Color.Magenta)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "Jennie Davis", fontSize = 16.sp)
+            Text(text = "Jennie Davis", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -231,13 +242,14 @@ private fun TopBar() {
 @Composable
 private fun ProfilePicture(
     isOnline: Boolean,
+    color: Color = Color.Black
 ) {
     Box {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
-                .background(Color.Black)
+                .background(color)
         )
         AnimatedVisibility(visible = isOnline, modifier = Modifier.align(Alignment.BottomEnd)) {
             Box(
@@ -257,6 +269,44 @@ private fun DateText(
 ) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Text(text = dateStr, color = grayColor, textAlign = TextAlign.Center)
+    }
+}
+
+@Composable
+private fun BottomBar(
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        TextField(
+            value = "",
+            onValueChange = {},
+            shape = RoundedCornerShape(50),
+            placeholder = {
+                Text(text = "Enter Message...")
+            },
+            trailingIcon = {
+                Row(modifier = Modifier.padding(end = 16.dp)) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_mic_24),
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_attach_file_24),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .graphicsLayer { rotationZ = 45f }
+                    )
+                }
+            },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = grayColor,
+                focusedContainerColor = grayColor
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
