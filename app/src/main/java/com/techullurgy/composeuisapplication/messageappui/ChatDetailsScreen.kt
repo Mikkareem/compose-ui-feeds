@@ -1,6 +1,7 @@
 package com.techullurgy.composeuisapplication.messageappui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationEndReason
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -22,14 +23,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -298,28 +304,45 @@ private fun BottomBar(
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
+        var messageValue by remember { mutableStateOf(" e") }
         TextField(
-            value = "",
-            onValueChange = {},
+            value = messageValue,
+            onValueChange = { messageValue = it },
+            textStyle = LocalTextStyle.current.copy(fontSize = 20.sp),
             shape = RoundedCornerShape(50),
             placeholder = {
                 Text(text = "Enter Message...")
             },
             trailingIcon = {
-                Row(modifier = Modifier.padding(end = 16.dp)) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_mic_24),
-                        contentDescription = null,
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_attach_file_24),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(32.dp)
-                            .graphicsLayer { rotationZ = 45f }
-                    )
+                Crossfade(targetState = messageValue.isNotBlank(), label = "") {
+                    if(it) {
+                        IconButton(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .background(Color.Black)
+                                .padding(4.dp)
+                                .graphicsLayer { rotationZ = -45f },
+                            onClick = { /*TODO*/ }
+                        ) {
+                            Icon(imageVector = Icons.Default.Send, contentDescription = null, tint = Color.White)
+                        }
+                    } else {
+                        Row(modifier = Modifier.padding(end = 16.dp)) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_mic_24),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_attach_file_24),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .graphicsLayer { rotationZ = 45f }
+                            )
+                        }
+                    }
                 }
             },
             colors = TextFieldDefaults.colors(
