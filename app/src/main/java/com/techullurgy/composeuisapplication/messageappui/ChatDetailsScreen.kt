@@ -1,6 +1,9 @@
 package com.techullurgy.composeuisapplication.messageappui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationEndReason
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,10 +40,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.techullurgy.composeuisapplication.R
+import com.techullurgy.composeuisapplication.math.map
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private val grayColor = Color(0xff8a95b3)
 
@@ -132,6 +142,16 @@ private fun MessagesSection(
                 }
             }
             Spacer(modifier = Modifier.height(4.dp))
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            val alpha = 0.4f
+            ProfilePicture(isOnline = true, color = Color.Magenta, alpha = alpha)
+            Spacer(modifier = Modifier.width(8.dp))
+            TypingIndicator(alpha = alpha)
         }
     }
 }
@@ -242,21 +262,22 @@ private fun TopBar() {
 @Composable
 private fun ProfilePicture(
     isOnline: Boolean,
-    color: Color = Color.Black
+    color: Color = Color.Black,
+    alpha: Float = 1f
 ) {
     Box {
         Box(
             modifier = Modifier
                 .size(50.dp)
                 .clip(CircleShape)
-                .background(color)
+                .background(color.copy(alpha = alpha))
         )
         AnimatedVisibility(visible = isOnline, modifier = Modifier.align(Alignment.BottomEnd)) {
             Box(
                 modifier = Modifier
                     .size(15.dp)
                     .clip(CircleShape)
-                    .background(Color.Green)
+                    .background(Color.Green.copy(alpha = alpha))
                     .border(2.dp, Color.White, CircleShape)
             )
         }
@@ -307,6 +328,64 @@ private fun BottomBar(
             ),
             modifier = Modifier.fillMaxWidth()
         )
+    }
+}
+
+@Composable
+private fun TypingIndicator(
+    totalDots: Int = 3,
+    alpha: Float = 1f
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(35))
+            .background(grayColor.copy(alpha = alpha))
+            .padding(16.dp)
+    ) {
+        val animationProgresses = remember { List(totalDots) { Animatable(0f) } }
+
+        LaunchedEffect(key1 = Unit) {
+            launch {
+                while (true) {
+                    animationProgresses.forEach {
+                        launch {
+                            val result = it.animateTo(1f)
+                            if(result.endReason == AnimationEndReason.Finished) {
+                                it.animateTo(0f)
+                            }
+                        }
+                        delay(100)
+                    }
+                    delay(700)
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.height(25.dp),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            repeat(totalDots) {
+                Box(
+                    modifier = Modifier
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = map(
+                                    FastOutSlowInEasing.transform(animationProgresses[it].value),
+                                    0f,
+                                    1f,
+                                    0f,
+                                    -10.dp.toPx()
+                                ).toInt()
+                            )
+                        }
+                        .size(13.dp)
+                        .clip(CircleShape)
+                        .background(Color.Black.copy(alpha = alpha))
+                )
+            }
+        }
     }
 }
 
