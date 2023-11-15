@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,11 +25,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 fun OptionsPicker(
@@ -38,7 +43,8 @@ fun OptionsPicker(
     modifier: Modifier = Modifier,
     title: String = "Please Select one option",
     accentColor: Color = Color.Blue,
-    fontSize: TextUnit = MaterialTheme.typography.labelLarge.fontSize
+    fontSize: TextUnit = MaterialTheme.typography.labelLarge.fontSize,
+    isDestructive: Boolean = true
 ) {
     require(options.contains(value) || value.isEmpty())
 
@@ -55,6 +61,7 @@ fun OptionsPicker(
 
     if(optionShow) {
         OptionsPickerDialog(
+            isDestructive = isDestructive,
             title = title,
             options = options,
             onValueChange = onValueChange,
@@ -65,24 +72,31 @@ fun OptionsPicker(
 
 @Composable
 private fun OptionsPickerDialog(
+    isDestructive: Boolean,
     title: String,
     options: List<String>,
     onDismissRequest: () -> Unit = {},
     onValueChange: (String) -> Unit = {}
 ) {
     Dialog(
-        onDismissRequest = onDismissRequest
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            dismissOnClickOutside = isDestructive,
+            dismissOnBackPress = isDestructive
+        )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth(0.8f)
                 .heightIn(max = 300.dp)
-                .background(Color.White),
+                .clip(RoundedCornerShape(25f))
+                .background(Color.White)
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(text = title)
-            LazyColumn {
+            LazyColumn(modifier = Modifier.weight(1f)) {
                 items(options) {
                     Box(
                         modifier = Modifier
@@ -101,6 +115,22 @@ private fun OptionsPickerDialog(
                         )
                     }
                     Divider()
+                }
+            }
+
+            if(isDestructive) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            onDismissRequest()
+                        }
+                        .clip(RoundedCornerShape(25))
+                        .background(Color.Red.copy(alpha = 0.7f))
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "Cancel", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -130,7 +160,8 @@ fun OptionsPickerPreview() {
                 options = colors,
                 value = selectedValue,
                 onValueChange = { selectedValue = it },
-                title = "Please select one Color"
+                title = "Please select one Color",
+//                isDestructive = false
             )
         }
     }
