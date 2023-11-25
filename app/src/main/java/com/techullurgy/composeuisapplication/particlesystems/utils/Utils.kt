@@ -1,6 +1,9 @@
 package com.techullurgy.composeuisapplication.particlesystems.utils
 
 import androidx.compose.ui.geometry.Offset
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -60,3 +63,12 @@ internal fun Offset.Companion.randomYMirror(yMax: Float): Offset
             x = 0f,
             y = Random.nextFloat(from = -yMax, until = yMax+1),
         )
+
+internal fun Offset.Companion.random2D(): Offset {
+    val angle = Random.nextDouble() * (2*PI)
+    val length = 1
+    return Offset(
+        x = (length * cos(angle)).toFloat(),
+        y = (length * sin(angle)).toFloat()
+    )
+}
