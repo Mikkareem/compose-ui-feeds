@@ -21,10 +21,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -253,7 +251,7 @@ private fun Placeable?.heightOrZero(): Int = this?.height ?: 0
 
 @Preview
 @Composable
-fun Test() {
+fun CustomTextFieldPreview() {
     var text by remember {
         val t1 = "Hello World".padEnd(280, 'a')
         mutableStateOf(TextFieldValue(t1))
@@ -285,12 +283,12 @@ fun Test() {
                 .fillMaxWidth()
         )
 
-        Button(onClick = { focusRequester.requestFocus() }) {
-            Text(text = "Request Focus")
-        }
-
-        Button(onClick = { focusManager.clearFocus() }) {
-            Text(text = "Leave Focus")
-        }
+//        Button(onClick = { focusRequester.requestFocus() }) {
+//            Text(text = "Request Focus")
+//        }
+//
+//        Button(onClick = { focusManager.clearFocus() }) {
+//            Text(text = "Leave Focus")
+//        }
     }
 }
