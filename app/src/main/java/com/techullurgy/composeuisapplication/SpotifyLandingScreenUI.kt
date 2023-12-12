@@ -48,7 +48,7 @@ private fun SpotifyLandingScreenUI() {
 
     val poppinsTextStyle = remember(currentTextStyle) {
 //        currentTextStyle.copy(fontFamily = PoppinsFontFamily, letterSpacing = (-0.75f).sp, color = Color.White, lineHeight = (14).sp)
-        currentTextStyle
+        currentTextStyle.copy(color = Color.White)
     }
 
     CompositionLocalProvider(LocalTextStyle provides poppinsTextStyle) {
